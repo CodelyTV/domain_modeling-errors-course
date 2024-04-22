@@ -21,4 +21,8 @@ export class PostMother {
 
 		return Post.fromPrimitives(primitives);
 	}
+
+	static createNew(): Post {
+		return PostMother.create({ totalLikes: 0 });
+	}
 }

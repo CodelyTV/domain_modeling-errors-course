@@ -5,9 +5,7 @@ import { Clock } from "../../../shared/domain/Clock";
 import { UserId } from "../../users/domain/UserId";
 import { PostContent } from "./PostContent";
 import { PostId } from "./PostId";
-import { PostLatestLike } from "./PostLatestLike";
 import { PostLatestLikes } from "./PostLatestLikes";
-import { PostLikesIncrementedDomainEvent } from "./PostLikesIncrementedDomainEvent";
 import { PostPublishedDomainEvent } from "./PostPublishedDomainEvent";
 import { PostTotalLikes } from "./PostTotalLikes";
 
@@ -58,15 +56,5 @@ export class Post extends AggregateRoot {
 			latestLikes: this.latestLikes.toPrimitives(),
 			createdAt: this.createdAt,
 		};
-	}
-
-	incrementTotalLikes(): void {
-		this.totalLikes = this.totalLikes.increment();
-
-		this.record(new PostLikesIncrementedDomainEvent(this.id.value, this.totalLikes.value));
-	}
-
-	addLatestLike(postLatestLike: PostLatestLike): void {
-		this.latestLikes = this.latestLikes.add(postLatestLike);
 	}
 }
