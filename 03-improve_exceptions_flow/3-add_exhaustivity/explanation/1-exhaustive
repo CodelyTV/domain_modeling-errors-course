@@ -1,0 +1,35 @@
+/* eslint-disable no-console,no-case-declarations */
+type UserNameTooLongError = {
+	name: "UserNameTooLongError";
+	message: string;
+};
+
+type UserPostAlreadyLikedError = {
+	name: "UserPostAlreadyLikedError";
+	message: string;
+};
+
+type PostAlreadyExistsError = {
+	name: "PostAlreadyExistsError";
+	message: string;
+};
+
+type Errors = UserNameTooLongError | UserPostAlreadyLikedError | PostAlreadyExistsError;
+
+function handleErrors(error: Errors): void {
+	switch (error.name) {
+		case "UserNameTooLongError":
+			console.log("User name is too long");
+			break;
+		case "UserPostAlreadyLikedError":
+			console.log("User already liked this post");
+			break;
+		case "PostAlreadyExistsError":
+			console.log("Post already exists");
+			break;
+		default:
+			const exhaustiveCheck: never = error;
+
+			return exhaustiveCheck;
+	}
+}

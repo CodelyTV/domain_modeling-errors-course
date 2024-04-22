@@ -1,14 +1,15 @@
 import { NextRequest } from "next/server";
 
-import { PostLiker } from "../../../../contexts/rrss/post_likes/application/like/PostLiker";
+import {
+	PostLiker,
+	PostLikerErrors,
+} from "../../../../contexts/rrss/post_likes/application/like/PostLiker";
 import { NullPostLikeRepository } from "../../../../contexts/rrss/post_likes/infrastructure/NullPostLikeRepository";
 import { PostFinder } from "../../../../contexts/rrss/posts/application/find/PostFinder";
-import { PostDoesNotExistError } from "../../../../contexts/rrss/posts/domain/PostDoesNotExistError";
 import { NullPostRepository } from "../../../../contexts/rrss/posts/infrastructure/NullPostRepository";
 import { UserFinder } from "../../../../contexts/rrss/users/application/find/UserFinder";
-import { UserDoesNotExistError } from "../../../../contexts/rrss/users/domain/UserDoesNotExistError";
 import { NullUserRepository } from "../../../../contexts/rrss/users/infrastructure/NullUserRepository";
-import { DomainError } from "../../../../contexts/shared/domain/DomainError";
+import { assertNever } from "../../../../contexts/shared/domain/assertNever";
 import { InMemoryEventBus } from "../../../../contexts/shared/infrastructure/bus/InMemoryEventBus";
 import { DateClock } from "../../../../contexts/shared/infrastructure/DateClock";
 import { executeWithErrorHandling } from "../../../../contexts/shared/infrastructure/http/executeWithErrorHandling";
@@ -34,12 +35,13 @@ export async function PUT(
 
 			return HttpNextResponse.created();
 		},
-		(error: DomainError) => {
-			switch (error.constructor) {
-				case PostDoesNotExistError:
+		(error: PostLikerErrors) => {
+			switch (error.errorName) {
+				case "PostDoesNotExistError":
+				case "UserDoesNotExistError":
 					return HttpNextResponse.domainError(error, 409);
-				case UserDoesNotExistError:
-					return HttpNextResponse.domainError(error, 409);
+				default:
+					assertNever(error);
 			}
 		},
 	);

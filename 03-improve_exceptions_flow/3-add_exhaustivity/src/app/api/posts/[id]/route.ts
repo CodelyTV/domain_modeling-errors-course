@@ -1,12 +1,13 @@
 import { NextRequest } from "next/server";
 
 import { PostFinder } from "../../../../contexts/rrss/posts/application/find/PostFinder";
-import { PostPublisher } from "../../../../contexts/rrss/posts/application/publish/PostPublisher";
-import { PostContentIsEmptyError } from "../../../../contexts/rrss/posts/domain/PostContentIsEmptyError";
-import { PostContentTooLongError } from "../../../../contexts/rrss/posts/domain/PostContentTooLongError";
+import {
+	PostPublisher,
+	PostPublisherErrors,
+} from "../../../../contexts/rrss/posts/application/publish/PostPublisher";
 import { PostDoesNotExistError } from "../../../../contexts/rrss/posts/domain/PostDoesNotExistError";
 import { NullPostRepository } from "../../../../contexts/rrss/posts/infrastructure/NullPostRepository";
-import { DomainError } from "../../../../contexts/shared/domain/DomainError";
+import { assertNever } from "../../../../contexts/shared/domain/assertNever";
 import { InMemoryEventBus } from "../../../../contexts/shared/infrastructure/bus/InMemoryEventBus";
 import { DateClock } from "../../../../contexts/shared/infrastructure/DateClock";
 import { executeWithErrorHandling } from "../../../../contexts/shared/infrastructure/http/executeWithErrorHandling";
@@ -29,12 +30,13 @@ export async function PUT(
 
 			return HttpNextResponse.created();
 		},
-		(error: DomainError) => {
-			switch (error.constructor) {
-				case PostContentIsEmptyError:
+		(error: PostPublisherErrors) => {
+			switch (error.errorName) {
+				case "PostContentIsEmptyError":
+				case "PostContentTooLongError":
 					return HttpNextResponse.domainError(error, 400);
-				case PostContentTooLongError:
-					return HttpNextResponse.domainError(error, 400);
+				default:
+					assertNever(error);
 			}
 		},
 	);
@@ -50,10 +52,8 @@ export async function GET(
 
 			return HttpNextResponse.json(post);
 		},
-		(error: DomainError) => {
-			if (error.constructor === PostDoesNotExistError) {
-				return HttpNextResponse.domainError(error, 404);
-			}
+		(error: PostDoesNotExistError) => {
+			return HttpNextResponse.domainError(error, 404);
 		},
 	);
 }

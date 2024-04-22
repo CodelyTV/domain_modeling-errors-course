@@ -1,6 +1,9 @@
+import { UserDoesNotExistError } from "../../domain/UserDoesNotExistError";
 import { UserFinder as DomainUserFinder } from "../../domain/UserFinder";
 import { UserRepository } from "../../domain/UserRepository";
 import { UserPrimitives } from "../UserPrimitives";
+
+export type UserFinderErrors = UserDoesNotExistError;
 
 export class UserFinder {
 	private readonly finder: DomainUserFinder;

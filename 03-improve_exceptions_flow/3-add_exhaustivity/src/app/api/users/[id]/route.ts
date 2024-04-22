@@ -4,7 +4,6 @@ import { UserFinder } from "../../../../contexts/rrss/users/application/find/Use
 import { UserRegistrar } from "../../../../contexts/rrss/users/application/registrar/UserRegistrar";
 import { UserDoesNotExistError } from "../../../../contexts/rrss/users/domain/UserDoesNotExistError";
 import { NullUserRepository } from "../../../../contexts/rrss/users/infrastructure/NullUserRepository";
-import { DomainError } from "../../../../contexts/shared/domain/DomainError";
 import { InMemoryEventBus } from "../../../../contexts/shared/infrastructure/bus/InMemoryEventBus";
 import { executeWithErrorHandling } from "../../../../contexts/shared/infrastructure/http/executeWithErrorHandling";
 import { HttpNextResponse } from "../../../../contexts/shared/infrastructure/http/HttpNextResponse";
@@ -37,10 +36,8 @@ export async function GET(
 
 			return HttpNextResponse.json(user);
 		},
-		(error: DomainError) => {
-			if (error.constructor === UserDoesNotExistError) {
-				return HttpNextResponse.domainError(error, 404);
-			}
+		(error: UserDoesNotExistError) => {
+			return HttpNextResponse.domainError(error, 404);
 		},
 	);
 }

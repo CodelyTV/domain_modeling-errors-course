@@ -1,7 +1,11 @@
 import { Clock } from "../../../../shared/domain/Clock";
 import { EventBus } from "../../../../shared/domain/event/EventBus";
 import { Post } from "../../domain/Post";
+import { PostContentIsEmptyError } from "../../domain/PostContentIsEmptyError";
+import { PostContentTooLongError } from "../../domain/PostContentTooLongError";
 import { PostRepository } from "../../domain/PostRepository";
+
+export type PostPublisherErrors = PostContentIsEmptyError | PostContentTooLongError;
 
 export class PostPublisher {
 	constructor(
