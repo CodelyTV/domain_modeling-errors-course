@@ -7,7 +7,7 @@ export class HttpNextResponse {
 		return NextResponse.json(
 			{
 				code: error.errorName,
-				message: error.message(),
+				message: error.message,
 				data: error.toPrimitives(),
 			},
 			{ status: statusCode },

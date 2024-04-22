@@ -5,10 +5,12 @@ import { PostDoesNotExistError } from "../../domain/PostDoesNotExistError";
 import { PostId } from "../../domain/PostId";
 import { PostRepository } from "../../domain/PostRepository";
 
+export type PostPrimitives = Primitives<Post>;
+
 export class PostFinder {
 	constructor(private readonly repository: PostRepository) {}
 
-	async find(id: string): Promise<Primitives<Post>> {
+	async find(id: string): Promise<PostPrimitives> {
 		const post = await this.repository.search(new PostId(id));
 
 		if (!post) {

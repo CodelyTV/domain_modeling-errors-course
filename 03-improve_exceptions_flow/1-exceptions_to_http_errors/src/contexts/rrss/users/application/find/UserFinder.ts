@@ -1,18 +1,15 @@
-import { UserPrimitives } from "../../domain/User";
-import { UserDoesNotExistError } from "../../domain/UserDoesNotExistError";
-import { UserId } from "../../domain/UserId";
+import { UserFinder as DomainUserFinder } from "../../domain/UserFinder";
 import { UserRepository } from "../../domain/UserRepository";
+import { UserPrimitives } from "../UserPrimitives";
 
 export class UserFinder {
-	constructor(private readonly repository: UserRepository) {}
+	private readonly finder: DomainUserFinder;
+
+	constructor(repository: UserRepository) {
+		this.finder = new DomainUserFinder(repository);
+	}
 
 	async find(id: string): Promise<UserPrimitives> {
-		const user = await this.repository.search(new UserId(id));
-
-		if (user === null) {
-			throw new UserDoesNotExistError(id);
-		}
-
-		return user.toPrimitives();
+		return (await this.finder.find(id)).toPrimitives();
 	}
 }

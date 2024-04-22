@@ -1,4 +1,6 @@
-import { UserPrimitives } from "../../../../../src/contexts/rrss/users/domain/User";
+import { Primitives } from "@codelytv/primitives-type";
+
+import { User } from "../../../../../src/contexts/rrss/users/domain/User";
 import { UserRegisteredDomainEvent } from "../../../../../src/contexts/rrss/users/domain/UserRegisteredDomainEvent";
 import { UserStatus } from "../../../../../src/contexts/rrss/users/domain/UserStatus";
 import { UserEmailMother } from "./UserEmailMother";
@@ -7,8 +9,8 @@ import { UserNameMother } from "./UserNameMother";
 import { UserProfilePictureMother } from "./UserProfilePictureMother";
 
 export class UserRegisteredDomainEventMother {
-	static create(params?: Partial<UserPrimitives>): UserRegisteredDomainEvent {
-		const primitives: UserPrimitives = {
+	static create(params?: Partial<Primitives<User>>): UserRegisteredDomainEvent {
+		const primitives: Primitives<User> = {
 			id: UserIdMother.create().value,
 			name: UserNameMother.create().value,
 			email: UserEmailMother.create().value,
@@ -22,7 +24,7 @@ export class UserRegisteredDomainEventMother {
 			primitives.name,
 			primitives.email,
 			primitives.profilePicture,
-			primitives.status,
+			primitives.status as string,
 		);
 	}
 }
