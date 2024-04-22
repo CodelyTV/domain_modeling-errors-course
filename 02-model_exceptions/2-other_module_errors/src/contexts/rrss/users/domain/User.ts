@@ -1,7 +1,5 @@
 import { AggregateRoot } from "../../../shared/domain/AggregateRoot";
-import { UserArchivedDomainEvent } from "./UserArchivedDomainEvent";
 import { UserEmail } from "./UserEmail";
-import { UserEmailUpdatedDomainEvent } from "./UserEmailUpdatedDomainEvent";
 import { UserId } from "./UserId";
 import { UserName } from "./UserName";
 import { UserProfilePicture } from "./UserProfilePicture";
@@ -61,17 +59,5 @@ export class User extends AggregateRoot {
 			profilePicture: this.profilePicture.value,
 			status: this.status,
 		};
-	}
-
-	updateEmail(email: string): void {
-		this.email = new UserEmail(email);
-
-		this.record(new UserEmailUpdatedDomainEvent(this.id.value, email));
-	}
-
-	archive(): void {
-		this.status = UserStatus.Archived;
-
-		this.record(new UserArchivedDomainEvent(this.id.value));
 	}
 }

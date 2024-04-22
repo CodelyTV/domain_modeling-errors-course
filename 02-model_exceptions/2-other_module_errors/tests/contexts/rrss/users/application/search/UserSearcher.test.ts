@@ -20,6 +20,6 @@ describe("UserSearcher should", () => {
 
 		repository.shouldSearch(existingUser);
 
-		expect(await userSearcher.search(existingUser.id.value)).toBe(existingUser);
+		expect(await userSearcher.search(existingUser.id.value)).toEqual(existingUser.toPrimitives());
 	});
 });

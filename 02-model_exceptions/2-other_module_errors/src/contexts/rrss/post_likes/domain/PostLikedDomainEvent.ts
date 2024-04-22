@@ -6,7 +6,7 @@ export class PostLikedDomainEvent extends DomainEvent {
 	constructor(
 		public readonly id: string,
 		public readonly postId: string,
-		public readonly userId: string,
+		public readonly likerUserId: string,
 		eventId?: string,
 		occurredOn?: Date,
 	) {
@@ -22,7 +22,7 @@ export class PostLikedDomainEvent extends DomainEvent {
 		return new PostLikedDomainEvent(
 			aggregateId,
 			attributes.postId as string,
-			attributes.userId as string,
+			attributes.likerUserId as string,
 			eventId,
 			occurredOn,
 		);
@@ -32,7 +32,7 @@ export class PostLikedDomainEvent extends DomainEvent {
 		return {
 			id: this.id,
 			postId: this.postId,
-			userId: this.userId,
+			likerUserId: this.likerUserId,
 		};
 	}
 }

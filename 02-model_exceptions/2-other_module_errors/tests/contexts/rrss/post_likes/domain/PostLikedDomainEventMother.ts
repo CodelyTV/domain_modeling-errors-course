@@ -11,11 +11,11 @@ export class PostLikedDomainEventMother {
 		const primitives: Primitives<PostLike> = {
 			id: PostLikeIdMother.create().value,
 			postId: PostIdMother.create().value,
-			userId: UserIdMother.create().value,
+			likerUserId: UserIdMother.create().value,
 			likedAt: new Date(),
 			...params,
 		};
 
-		return new PostLikedDomainEvent(primitives.id, primitives.postId, primitives.userId);
+		return new PostLikedDomainEvent(primitives.id, primitives.postId, primitives.likerUserId);
 	}
 }

@@ -11,21 +11,21 @@ export class PostLike extends AggregateRoot {
 	private constructor(
 		public readonly id: PostLikeId,
 		public readonly postId: PostLikeId,
-		public readonly userId: UserId,
+		public readonly likerUserId: UserId,
 		public readonly likedAt: Date,
 	) {
 		super();
 	}
 
-	static like(id: string, postId: string, userId: string, clock: Clock): PostLike {
+	static like(id: string, postId: string, likerUserId: string, clock: Clock): PostLike {
 		const post = new PostLike(
 			new PostLikeId(id),
 			new PostId(postId),
-			new UserId(userId),
+			new UserId(likerUserId),
 			clock.now(),
 		);
 
-		post.record(new PostLikedDomainEvent(id, postId, userId));
+		post.record(new PostLikedDomainEvent(id, postId, likerUserId));
 
 		return post;
 	}
@@ -34,7 +34,7 @@ export class PostLike extends AggregateRoot {
 		return new PostLike(
 			new PostLikeId(primitives.id),
 			new PostId(primitives.postId),
-			new UserId(primitives.userId),
+			new UserId(primitives.likerUserId),
 			primitives.likedAt as Date,
 		);
 	}
@@ -42,7 +42,7 @@ export class PostLike extends AggregateRoot {
 	toPrimitives(): Primitives<PostLike> {
 		return {
 			id: this.id.value,
-			userId: this.userId.value,
+			likerUserId: this.likerUserId.value,
 			postId: this.postId.value,
 			likedAt: this.likedAt,
 		};

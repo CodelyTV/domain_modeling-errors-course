@@ -1,5 +1,5 @@
 import { User } from "./User";
-import { UserDoesNotExist } from "./UserDoesNotExist";
+import { UserDoesNotExistError } from "./UserDoesNotExistError";
 import { UserId } from "./UserId";
 import { UserRepository } from "./UserRepository";
 
@@ -10,7 +10,7 @@ export class UserFinder {
 		const user = await this.repository.search(new UserId(id));
 
 		if (user === null) {
-			throw new UserDoesNotExist(id);
+			throw new UserDoesNotExistError(id);
 		}
 
 		return user;
