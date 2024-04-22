@@ -28,4 +28,8 @@ export class HttpNextResponse {
 	static created(): NextResponse {
 		return new NextResponse(null, { status: 201 });
 	}
+
+	static json<JsonBody>(data: JsonBody): NextResponse {
+		return NextResponse.json(data, { status: 200 });
+	}
 }
