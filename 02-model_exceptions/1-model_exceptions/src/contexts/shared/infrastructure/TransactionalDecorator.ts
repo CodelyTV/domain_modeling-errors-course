@@ -5,7 +5,7 @@ export class TransactionalDecorator {
 	static decorate<T>(decorated: T, connection: DatabaseConnection): T {
 		// @ts-ignore
 		return new Proxy(decorated, {
-			get: (target, propKey, receiver) => {
+			get: (target, propKey, _receiver) => {
 				// @ts-ignore
 				const originalMethod = target[propKey];
 				if (typeof originalMethod === "function") {
