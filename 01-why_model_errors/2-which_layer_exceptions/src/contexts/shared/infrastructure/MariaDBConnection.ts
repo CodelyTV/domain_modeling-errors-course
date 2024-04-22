@@ -1,6 +1,7 @@
-import { createPool, Pool } from "mariadb";
+import { createPool, Pool, SqlError } from "mariadb";
 
 import { DatabaseConnection } from "../domain/DatabaseConnection";
+import { TooManyMariaDbConnectionsException } from "./TooManyMariaDbConnectionsException";
 
 interface MinimalConnection {
 	query: (sql: string) => Promise<unknown>;
@@ -28,10 +29,20 @@ export class MariaDBConnection extends DatabaseConnection {
 	}
 
 	async searchOne<T>(query: string): Promise<T | null> {
-		const conn = await this.getConnection();
-		const rows = (await conn.query(query)) as T[];
+		try {
+			const conn = await this.getConnection();
+			const rows = (await conn.query(query)) as T[];
 
-		return rows[0] ?? null;
+			return rows[0] ?? null;
+		} catch (error) {
+			if (error instanceof SqlError) {
+				if (error.errno === 8004) {
+					throw new TooManyMariaDbConnectionsException();
+				}
+			}
+		}
+
+		return null;
 	}
 
 	async searchAll<T>(query: string): Promise<T[]> {
