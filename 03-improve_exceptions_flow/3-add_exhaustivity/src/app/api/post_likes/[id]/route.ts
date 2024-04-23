@@ -36,7 +36,7 @@ export async function PUT(
 			return HttpNextResponse.created();
 		},
 		(error: PostLikerErrors) => {
-			switch (error.errorName) {
+			switch (error.type) {
 				case "PostDoesNotExistError":
 				case "UserDoesNotExistError":
 					return HttpNextResponse.domainError(error, 409);

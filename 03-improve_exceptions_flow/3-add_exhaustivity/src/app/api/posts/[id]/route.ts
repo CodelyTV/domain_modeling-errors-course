@@ -31,7 +31,7 @@ export async function PUT(
 			return HttpNextResponse.created();
 		},
 		(error: PostPublisherErrors) => {
-			switch (error.errorName) {
+			switch (error.type) {
 				case "PostContentIsEmptyError":
 				case "PostContentTooLongError":
 					return HttpNextResponse.domainError(error, 400);

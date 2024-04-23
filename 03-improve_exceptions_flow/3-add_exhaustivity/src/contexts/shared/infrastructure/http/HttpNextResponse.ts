@@ -6,9 +6,7 @@ export class HttpNextResponse {
 	static domainError(error: DomainError, statusCode: number): NextResponse {
 		return NextResponse.json(
 			{
-				code: error.errorName,
-				message: error.message,
-				data: error.toPrimitives(),
+				error: error.toPrimitives(),
 			},
 			{ status: statusCode },
 		);
