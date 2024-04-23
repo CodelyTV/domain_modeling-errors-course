@@ -1,22 +1,22 @@
 /* eslint-disable no-console,no-case-declarations */
 
 abstract class DomainError extends Error {
-	abstract name: string;
+	abstract type: string;
 	abstract message: string;
 }
 
 class UserNameIsEmptyError extends DomainError {
-	type = "UserNameIsEmptyError";
+	readonly type = "UserNameIsEmptyError";
 	message = "User name is empty";
 }
 
 class PostIsDeletedError extends DomainError {
-	type = "PostIsDeletedError";
+	readonly type = "PostIsDeletedError";
 	message = "Post is deleted";
 }
 
 class PostIsArchivedError extends DomainError {
-	type = "PostIsArchivedError";
+	readonly type = "PostIsArchivedError";
 	message = "Post is archived";
 }
 
@@ -25,14 +25,11 @@ type AllErrors = UserNameIsEmptyError | PostIsDeletedError | PostIsArchivedError
 // type PostErrors = PostIsDeletedError | PostIsArchivedError;
 
 function handleErrors(error: AllErrors): void {
-	switch (error.constructor) {
-		case UserNameIsEmptyError:
+	switch (error.type) {
+		case "UserNameIsEmptyError":
 			console.log("UserNameIsEmptyError");
 			break;
-		case PostIsDeletedError:
-			console.log("PostIsDeletedError");
-			break;
-		case PostIsArchivedError:
+		case "PostIsArchivedError":
 			console.log("PostIsArchivedError");
 			break;
 		default:
@@ -43,7 +40,5 @@ function handleErrors(error: AllErrors): void {
 }
 
 const error = new UserNameIsEmptyError();
-
-error.constructor = () => {};
 
 handleErrors(error);
