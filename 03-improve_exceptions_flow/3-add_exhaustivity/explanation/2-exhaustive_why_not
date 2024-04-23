@@ -6,17 +6,17 @@ abstract class DomainError extends Error {
 }
 
 class UserNameIsEmptyError extends DomainError {
-	name = "UserNameIsEmptyError";
+	type = "UserNameIsEmptyError";
 	message = "User name is empty";
 }
 
 class PostIsDeletedError extends DomainError {
-	name = "PostIsDeletedError";
+	type = "PostIsDeletedError";
 	message = "Post is deleted";
 }
 
 class PostIsArchivedError extends DomainError {
-	name = "PostIsArchivedError";
+	type = "PostIsArchivedError";
 	message = "Post is archived";
 }
 
