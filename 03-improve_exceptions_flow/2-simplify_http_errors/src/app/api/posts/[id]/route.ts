@@ -32,7 +32,6 @@ export async function PUT(
 		(error: DomainError) => {
 			switch (error.constructor) {
 				case PostContentIsEmptyError:
-					return HttpNextResponse.domainError(error, 400);
 				case PostContentTooLongError:
 					return HttpNextResponse.domainError(error, 400);
 			}

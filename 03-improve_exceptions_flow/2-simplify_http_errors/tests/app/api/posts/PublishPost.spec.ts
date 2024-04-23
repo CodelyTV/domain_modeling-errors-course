@@ -20,9 +20,11 @@ test("returns bad request publishing an empty post", async ({ request }) => {
 	expect(response.status()).toBe(400);
 
 	expect(responseBody).toEqual({
-		code: "PostContentIsEmptyError",
-		message: "Post content is empty",
-		data: {},
+		error: {
+			type: "PostContentIsEmptyError",
+			description: "Post content is empty",
+			data: {},
+		},
 	});
 });
 
@@ -40,11 +42,13 @@ test("returns bad request publishing a too long post", async ({ request }) => {
 	expect(response.status()).toBe(400);
 
 	expect(responseBody).toEqual({
-		code: "PostContentTooLongError",
-		message: `The post content <<< ${postContent} >>> is longer than 280 characters.`,
-		data: {
-			content: postContent,
-			maxLength: 280,
+		error: {
+			type: "PostContentTooLongError",
+			description: `The post content <<< ${postContent} >>> is longer than 280 characters.`,
+			data: {
+				content: postContent,
+				maxLength: 280,
+			},
 		},
 	});
 });
