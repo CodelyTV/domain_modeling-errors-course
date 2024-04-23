@@ -3,7 +3,7 @@ import { PostContentIsEmptyError } from "./PostContentIsEmptyError";
 import { PostContentTooLongError } from "./PostContentTooLongError";
 
 export class PostContent extends StringValueObject {
-	public static readonly maxLength = 280;
+	private static readonly maxLength = 280;
 
 	constructor(value: string) {
 		if (value.length === 0) {
