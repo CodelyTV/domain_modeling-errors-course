@@ -1,19 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 export abstract class DomainError extends Error {
-	protected constructor(
-		public readonly type: string,
-		private readonly description: string,
-		private readonly data: Record<string, unknown> = {},
-	) {
-		super(description);
-	}
+	abstract type: string;
+	abstract message: string;
 
 	toPrimitives(): { type: string; description: string; data: Record<string, unknown> } {
+		const props = Object.entries(this).filter(([key, _]) => key !== "type" && key !== "message");
+
 		return {
 			type: this.type,
-			description: this.description,
-			data: this.data,
+			description: this.message,
+			data: props.reduce((acc, [key, value]) => {
+				return {
+					...acc,
+					[key]: value,
+				};
+			}, {}),
 		};
 	}
 }
