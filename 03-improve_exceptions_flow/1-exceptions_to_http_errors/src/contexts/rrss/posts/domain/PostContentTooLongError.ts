@@ -1,13 +1,14 @@
 import { DomainError } from "../../../shared/domain/DomainError";
 
 export class PostContentTooLongError extends DomainError {
-	errorName = "PostContentTooLongError";
-	message = `The post content <<< ${this.content} >>> is longer than ${this.maxLength} characters.`;
-
 	constructor(
 		public readonly content: string,
 		public readonly maxLength: number,
 	) {
-		super();
+		super(
+			"PostContentTooLongError",
+			`The post content <<< ${content} >>> is longer than ${maxLength} characters.`,
+			{ content, maxLength },
+		);
 	}
 }

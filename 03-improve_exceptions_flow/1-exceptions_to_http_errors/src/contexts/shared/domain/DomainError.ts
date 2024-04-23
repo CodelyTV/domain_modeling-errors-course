@@ -1,20 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Primitives } from "@codelytv/primitives-type";
 
 export abstract class DomainError extends Error {
-	abstract errorName: string;
-	abstract message: string;
+	protected constructor(
+		public readonly type: string,
+		private readonly description: string,
+		private readonly data: Record<string, unknown> = {},
+	) {
+		super(description);
+	}
 
-	toPrimitives(): Omit<Primitives<this>, "errorName" | "message"> {
-		const props = Object.entries(this).filter(
-			([key, _]) => key !== "errorName" && key !== "message",
-		);
-
-		return props.reduce((acc, [key, value]) => {
-			return {
-				...acc,
-				[key]: value,
-			};
-		}, {}) as Omit<Primitives<this>, "errorName" | "message">;
+	toPrimitives(): { type: string; description: string; data: Record<string, unknown> } {
+		return {
+			type: this.type,
+			description: this.description,
+			data: this.data,
+		};
 	}
 }
