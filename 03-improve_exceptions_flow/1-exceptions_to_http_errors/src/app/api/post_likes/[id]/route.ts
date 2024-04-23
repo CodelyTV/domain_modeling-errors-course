@@ -33,7 +33,6 @@ export async function PUT(
 		if (error instanceof DomainError) {
 			switch (error.constructor) {
 				case PostDoesNotExistError:
-					return HttpNextResponse.domainError(error, 409);
 				case UserDoesNotExistError:
 					return HttpNextResponse.domainError(error, 409);
 			}
