@@ -2,8 +2,11 @@ import { Primitives } from "@codelytv/primitives-type";
 
 import { AggregateRoot } from "../../../shared/domain/AggregateRoot";
 import { Clock } from "../../../shared/domain/Clock";
+import { Result } from "../../../shared/domain/Result";
 import { UserId } from "../../users/domain/UserId";
 import { PostContent } from "./PostContent";
+import { PostContentIsEmptyError } from "./PostContentIsEmptyError";
+import { PostContentTooLongError } from "./PostContentTooLongError";
 import { PostId } from "./PostId";
 import { PostLatestLikes } from "./PostLatestLikes";
 import { PostPublishedDomainEvent } from "./PostPublishedDomainEvent";
@@ -21,19 +24,26 @@ export class Post extends AggregateRoot {
 		super();
 	}
 
-	static publish(id: string, userId: string, content: string, clock: Clock): Post {
-		const post = new Post(
-			new PostId(id),
-			new UserId(userId),
-			new PostContent(content),
-			PostTotalLikes.init(),
-			PostLatestLikes.init(),
-			clock.now(),
-		);
+	static publish(
+		id: string,
+		userId: string,
+		content: string,
+		clock: Clock,
+	): Result<Post, PostContentIsEmptyError | PostContentTooLongError> {
+		return PostContent.create(content).map((postContent) => {
+			const post = new Post(
+				new PostId(id),
+				new UserId(userId),
+				postContent,
+				PostTotalLikes.init(),
+				PostLatestLikes.init(),
+				clock.now(),
+			);
 
-		post.record(new PostPublishedDomainEvent(id, userId, content));
+			post.record(new PostPublishedDomainEvent(id, userId, content));
 
-		return post;
+			return post;
+		});
 	}
 
 	static fromPrimitives(primitives: Primitives<Post>): Post {

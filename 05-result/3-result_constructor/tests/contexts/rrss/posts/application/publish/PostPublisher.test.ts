@@ -3,6 +3,7 @@ import { faker } from "@faker-js/faker";
 import { PostPublisher } from "../../../../../../src/contexts/rrss/posts/application/publish/PostPublisher";
 import { PostContentIsEmptyError } from "../../../../../../src/contexts/rrss/posts/domain/PostContentIsEmptyError";
 import { PostContentTooLongError } from "../../../../../../src/contexts/rrss/posts/domain/PostContentTooLongError";
+import { Result } from "../../../../../../src/contexts/shared/domain/Result";
 import { MockClock } from "../../../../shared/infrastructure/MockClock";
 import { MockEventBus } from "../../../../shared/infrastructure/MockEventBus";
 import { UserIdMother } from "../../../users/domain/UserIdMother";
@@ -18,7 +19,7 @@ describe("PostPublisher should", () => {
 
 	const postPublisher = new PostPublisher(clock, repository, eventBus);
 
-	it("throw an error publishing an empty post", async () => {
+	it("return an error publishing an empty post", async () => {
 		const postId = PostIdMother.create();
 		const userId = UserIdMother.create();
 
@@ -26,12 +27,12 @@ describe("PostPublisher should", () => {
 
 		const expectedError = new PostContentIsEmptyError();
 
-		await expect(postPublisher.publish(postId.value, userId.value, postContent)).rejects.toThrow(
-			expectedError,
+		expect(await postPublisher.publish(postId.value, userId.value, postContent)).toEqual(
+			Result.error(expectedError),
 		);
 	});
 
-	it("throw an error publishing a too long post", async () => {
+	it("return an error publishing a too long post", async () => {
 		const postId = PostIdMother.create();
 		const userId = UserIdMother.create();
 
@@ -40,8 +41,8 @@ describe("PostPublisher should", () => {
 
 		const expectedError = new PostContentTooLongError(postContent, maxPostLength);
 
-		await expect(postPublisher.publish(postId.value, userId.value, postContent)).rejects.toThrow(
-			expectedError,
+		expect(await postPublisher.publish(postId.value, userId.value, postContent)).toEqual(
+			Result.error(expectedError),
 		);
 	});
 
@@ -55,10 +56,12 @@ describe("PostPublisher should", () => {
 		repository.shouldSave(expectedPost);
 		eventBus.shouldPublish([expectedDomainEvent]);
 
-		await postPublisher.publish(
-			expectedPostPrimitives.id,
-			expectedPostPrimitives.userId,
-			expectedPostPrimitives.content,
-		);
+		expect(
+			await postPublisher.publish(
+				expectedPostPrimitives.id,
+				expectedPostPrimitives.userId,
+				expectedPostPrimitives.content,
+			),
+		).toEqual(Result.ok());
 	});
 });

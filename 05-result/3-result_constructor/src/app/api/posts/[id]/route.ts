@@ -1,15 +1,11 @@
 import { NextRequest } from "next/server";
 
 import { PostFinder } from "../../../../contexts/rrss/posts/application/find/PostFinder";
-import {
-	PostPublisher,
-	PostPublisherErrors,
-} from "../../../../contexts/rrss/posts/application/publish/PostPublisher";
+import { PostPublisher } from "../../../../contexts/rrss/posts/application/publish/PostPublisher";
 import { NullPostRepository } from "../../../../contexts/rrss/posts/infrastructure/NullPostRepository";
 import { assertNever } from "../../../../contexts/shared/domain/assertNever";
 import { InMemoryEventBus } from "../../../../contexts/shared/infrastructure/bus/InMemoryEventBus";
 import { DateClock } from "../../../../contexts/shared/infrastructure/DateClock";
-import { executeWithErrorHandling } from "../../../../contexts/shared/infrastructure/http/executeWithErrorHandling";
 import { HttpNextResponse } from "../../../../contexts/shared/infrastructure/http/HttpNextResponse";
 
 const repository = new NullPostRepository();
@@ -23,22 +19,22 @@ export async function PUT(
 ): Promise<Response> {
 	const body = (await request.json()) as { userId: string; content: string };
 
-	return executeWithErrorHandling(
-		async () => {
-			await publisher.publish(id, body.userId, body.content);
-
-			return HttpNextResponse.created();
-		},
-		(error: PostPublisherErrors) => {
-			switch (error.type) {
-				case "PostContentIsEmptyError":
-				case "PostContentTooLongError":
-					return HttpNextResponse.domainError(error, 400);
-				default:
-					assertNever(error);
-			}
-		},
-	);
+	try {
+		return (await publisher.publish(id, body.userId, body.content)).fold(
+			() => HttpNextResponse.created(),
+			(error) => {
+				switch (error.type) {
+					case "PostContentIsEmptyError":
+					case "PostContentTooLongError":
+						return HttpNextResponse.domainError(error, 400);
+					default:
+						assertNever(error);
+				}
+			},
+		);
+	} catch (error) {
+		return HttpNextResponse.internalServerError();
+	}
 }
 
 export async function GET(

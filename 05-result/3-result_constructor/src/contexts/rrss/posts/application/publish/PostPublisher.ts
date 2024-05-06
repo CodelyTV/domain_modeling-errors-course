@@ -1,5 +1,6 @@
 import { Clock } from "../../../../shared/domain/Clock";
 import { EventBus } from "../../../../shared/domain/event/EventBus";
+import { Result } from "../../../../shared/domain/Result";
 import { Post } from "../../domain/Post";
 import { PostContentIsEmptyError } from "../../domain/PostContentIsEmptyError";
 import { PostContentTooLongError } from "../../domain/PostContentTooLongError";
@@ -14,10 +15,16 @@ export class PostPublisher {
 		private readonly eventBus: EventBus,
 	) {}
 
-	async publish(id: string, userId: string, content: string): Promise<void> {
-		const post = Post.publish(id, userId, content, this.clock);
+	async publish(
+		id: string,
+		userId: string,
+		content: string,
+	): Promise<Result<void, PostContentIsEmptyError | PostContentTooLongError>> {
+		return await Post.publish(id, userId, content, this.clock).flatMapAsync(async (post) => {
+			await this.repository.save(post);
+			await this.eventBus.publish(post.pullDomainEvents());
 
-		await this.repository.save(post);
-		await this.eventBus.publish(post.pullDomainEvents());
+			return Result.ok();
+		});
 	}
 }
