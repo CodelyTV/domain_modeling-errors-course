@@ -1,5 +1,6 @@
 import { UserFinder } from "../../../../../../src/contexts/rrss/users/application/find/UserFinder";
 import { UserDoesNotExistError } from "../../../../../../src/contexts/rrss/users/domain/UserDoesNotExistError";
+import { Result } from "../../../../../../src/contexts/shared/domain/Result";
 import { UserIdMother } from "../../domain/UserIdMother";
 import { UserMother } from "../../domain/UserMother";
 import { MockUserRepository } from "../../infrastructure/MockUserRepository";
@@ -15,7 +16,7 @@ describe("UserFinder should", () => {
 
 		repository.shouldSearchAndReturnNull(userId);
 
-		await expect(finder.find(userId.value)).rejects.toThrow(expectedError);
+		expect(await finder.find(userId.value)).toEqual(Result.error(expectedError));
 	});
 
 	it("find an existing user", async () => {
@@ -23,6 +24,8 @@ describe("UserFinder should", () => {
 
 		repository.shouldSearch(existingUser);
 
-		expect(await finder.find(existingUser.id.value)).toEqual(existingUser.toPrimitives());
+		expect(await finder.find(existingUser.id.value)).toEqual(
+			Result.ok(existingUser.toPrimitives()),
+		);
 	});
 });

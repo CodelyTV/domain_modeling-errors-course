@@ -3,6 +3,7 @@ import { PostFinder } from "../../../../../../src/contexts/rrss/posts/applicatio
 import { PostDoesNotExistError } from "../../../../../../src/contexts/rrss/posts/domain/PostDoesNotExistError";
 import { UserFinder } from "../../../../../../src/contexts/rrss/users/application/find/UserFinder";
 import { UserDoesNotExistError } from "../../../../../../src/contexts/rrss/users/domain/UserDoesNotExistError";
+import { Result } from "../../../../../../src/contexts/shared/domain/Result";
 import { MockClock } from "../../../../shared/infrastructure/MockClock";
 import { MockEventBus } from "../../../../shared/infrastructure/MockEventBus";
 import { PostIdMother } from "../../../posts/domain/PostIdMother";
@@ -32,16 +33,20 @@ describe("PostLiker should", () => {
 		eventBus,
 	);
 
-	it("throw an error liking a non existing post", async () => {
+	it("return an error liking a non existing post", async () => {
 		const postId = PostIdMother.create();
 
 		const expectedError = new PostDoesNotExistError(postId.value);
 
 		postRepository.shouldSearchAndReturnNull(postId);
 
-		await expect(
-			postLiker.like(PostLikeIdMother.create().value, postId.value, UserIdMother.create().value),
-		).rejects.toThrow(expectedError);
+		expect(
+			await postLiker.like(
+				PostLikeIdMother.create().value,
+				postId.value,
+				UserIdMother.create().value,
+			),
+		).toEqual(Result.error(expectedError));
 	});
 
 	it("throw an error liking a post when the liker does not exist", async () => {
@@ -53,9 +58,13 @@ describe("PostLiker should", () => {
 		postRepository.shouldSearch(existingPost);
 		userRepository.shouldSearchAndReturnNull(likerUserId);
 
-		await expect(
-			postLiker.like(PostLikeIdMother.create().value, existingPost.id.value, likerUserId.value),
-		).rejects.toThrow(expectedError);
+		expect(
+			await postLiker.like(
+				PostLikeIdMother.create().value,
+				existingPost.id.value,
+				likerUserId.value,
+			),
+		).toEqual(Result.error(expectedError));
 	});
 
 	it("like a post", async () => {
@@ -71,10 +80,12 @@ describe("PostLiker should", () => {
 		repository.shouldSave(expectedPostLike);
 		eventBus.shouldPublish([expectedDomainEvent]);
 
-		await postLiker.like(
-			expectedPostLikePrimitives.id,
-			expectedPostLikePrimitives.postId,
-			expectedPostLikePrimitives.likerUserId,
-		);
+		expect(
+			await postLiker.like(
+				expectedPostLikePrimitives.id,
+				expectedPostLikePrimitives.postId,
+				expectedPostLikePrimitives.likerUserId,
+			),
+		).toEqual(Result.ok());
 	});
 });

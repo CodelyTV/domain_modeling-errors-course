@@ -1,5 +1,6 @@
 import { Clock } from "../../../../shared/domain/Clock";
 import { EventBus } from "../../../../shared/domain/event/EventBus";
+import { Result } from "../../../../shared/domain/Result";
 import { PostFinder } from "../../../posts/application/find/PostFinder";
 import { PostDoesNotExistError } from "../../../posts/domain/PostDoesNotExistError";
 import { UserFinder } from "../../../users/application/find/UserFinder";
@@ -18,21 +19,20 @@ export class PostLiker {
 		private readonly eventBus: EventBus,
 	) {}
 
-	async like(id: string, postId: string, likerUserId: string): Promise<void> {
-		await this.ensurePostExists(postId);
-		await this.ensureUserExists(likerUserId);
+	async like(
+		id: string,
+		postId: string,
+		likerUserId: string,
+	): Promise<Result<void, PostDoesNotExistError | UserDoesNotExistError>> {
+		return (await this.postFinder.find(postId)).flatMapAsync(async (_post) => {
+			return (await this.userFinder.find(likerUserId)).flatMapAsync(async (_user) => {
+				const postLike = PostLike.like(id, postId, likerUserId, this.clock);
 
-		const postLike = PostLike.like(id, postId, likerUserId, this.clock);
+				await this.repository.save(postLike);
+				await this.eventBus.publish(postLike.pullDomainEvents());
 
-		await this.repository.save(postLike);
-		await this.eventBus.publish(postLike.pullDomainEvents());
-	}
-
-	private async ensurePostExists(postId: string): Promise<void> {
-		await this.postFinder.find(postId);
-	}
-
-	private async ensureUserExists(userId: string): Promise<void> {
-		await this.userFinder.find(userId);
+				return Result.ok();
+			});
+		});
 	}
 }

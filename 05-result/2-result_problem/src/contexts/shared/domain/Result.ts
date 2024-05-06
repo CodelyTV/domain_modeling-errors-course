@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { DomainError } from "./DomainError";
 
 type Ok<O> = {
@@ -17,8 +18,8 @@ export class Result<O, E extends DomainError> {
 		return new Result<O, E>({ kind: "error", errorValue: value });
 	}
 
-	static ok<O, E extends DomainError>(value: O): Result<O, E> {
-		return new Result<O, E>({ kind: "ok", okValue: value });
+	static ok<O, E extends DomainError>(value?: O): Result<O, E> {
+		return new Result<O, E>({ kind: "ok", okValue: value! });
 	}
 
 	isError(): boolean {
@@ -51,6 +52,22 @@ export class Result<O, E extends DomainError> {
 		return this.fold(
 			(okValue) => Result.ok(fn(okValue)),
 			(errorValue) => Result.error(errorValue),
+		);
+	}
+
+	flatMap<T, U extends DomainError>(fn: (ok: O) => Result<T, E | U>): Result<T, E | U> {
+		return this.fold(
+			(okValue) => fn(okValue),
+			(errorValue) => Result.error(errorValue),
+		);
+	}
+
+	async flatMapAsync<T, U extends DomainError>(
+		fn: (ok: O) => Promise<Result<T, E | U>>,
+	): Promise<Result<T, E | U>> {
+		return this.fold(
+			async (okValue) => await fn(okValue),
+			(errorValue) => Promise.resolve(Result.error<T, E | U>(errorValue)),
 		);
 	}
 
