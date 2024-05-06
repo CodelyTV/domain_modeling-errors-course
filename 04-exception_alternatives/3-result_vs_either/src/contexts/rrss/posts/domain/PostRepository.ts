@@ -1,4 +1,3 @@
-import { Optional } from "../../../shared/domain/Optional";
 import { Post } from "./Post";
 import { PostId } from "./PostId";
 
@@ -7,5 +6,5 @@ export interface PostRepository {
 
 	search(id: PostId): Promise<Post | null>;
 
-	searchWithOptional(id: PostId): Promise<Optional<Post>>;
+	// searchWithOptional(id: PostId): Promise<Optional<Post>>;
 }
