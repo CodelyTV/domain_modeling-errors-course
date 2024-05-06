@@ -17,6 +17,10 @@ export class Optional<T> {
 		return this.isPresent() ? Optional.of(mapper(this.value)) : Optional.empty();
 	}
 
+	fold<R>(mapper: (value: T) => R, defaultValue: R): R {
+		return this.isPresent() ? mapper(this.value) : defaultValue;
+	}
+
 	isPresent(): boolean {
 		return this.value !== null;
 	}
