@@ -5,6 +5,4 @@ export interface PostRepository {
 	save(user: Post): Promise<void>;
 
 	search(id: PostId): Promise<Post | null>;
-
-	// searchWithOptional(id: PostId): Promise<Optional<Post>>;
 }

@@ -5,8 +5,8 @@ import {
 	PostPublisher,
 	PostPublisherErrors,
 } from "../../../../contexts/rrss/posts/application/publish/PostPublisher";
-import { PostDoesNotExistError } from "../../../../contexts/rrss/posts/domain/PostDoesNotExistError";
 import { NullPostRepository } from "../../../../contexts/rrss/posts/infrastructure/NullPostRepository";
+import { UserDoesNotExistError } from "../../../../contexts/rrss/users/domain/UserDoesNotExistError";
 import { assertNever } from "../../../../contexts/shared/domain/assertNever";
 import { InMemoryEventBus } from "../../../../contexts/shared/infrastructure/bus/InMemoryEventBus";
 import { DateClock } from "../../../../contexts/shared/infrastructure/DateClock";
@@ -46,14 +46,12 @@ export async function GET(
 	_request: NextRequest,
 	{ params: { id } }: { params: { id: string } },
 ): Promise<Response> {
-	return executeWithErrorHandling(
-		async () => {
-			const post = await finder.find(id);
-
-			return HttpNextResponse.json(post);
+	return (await finder.find(id)).fold(
+		() => {
+			return HttpNextResponse.domainError(new UserDoesNotExistError(id), 404);
 		},
-		(error: PostDoesNotExistError) => {
-			return HttpNextResponse.domainError(error, 404);
+		(post) => {
+			return HttpNextResponse.json(post);
 		},
 	);
 }

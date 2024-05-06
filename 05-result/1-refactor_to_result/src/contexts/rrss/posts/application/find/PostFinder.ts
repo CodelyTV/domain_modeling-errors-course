@@ -22,13 +22,4 @@ export class PostFinder {
 
 		return Result.ok(post.toPrimitives());
 	}
-
-	// async find(id: string): Promise<Result<PostPrimitives, PostDoesNotExistError>> {
-	// 	const post = await this.repository.searchWithOptional(new PostId(id));
-	//
-	// 	return post.fold(
-	// 		(post) => Result.ok(post.toPrimitives()),
-	// 		Result.error(new PostDoesNotExistError(id)),
-	// 	);
-	// }
 }
