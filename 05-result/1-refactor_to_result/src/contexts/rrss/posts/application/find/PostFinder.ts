@@ -1,5 +1,6 @@
 import { Primitives } from "@codelytv/primitives-type";
 
+import { Result } from "../../../../shared/domain/Result";
 import { Post } from "../../domain/Post";
 import { PostDoesNotExistError } from "../../domain/PostDoesNotExistError";
 import { PostId } from "../../domain/PostId";
@@ -12,13 +13,22 @@ export type PostFinderErrors = PostDoesNotExistError;
 export class PostFinder {
 	constructor(private readonly repository: PostRepository) {}
 
-	async find(id: string): Promise<PostPrimitives> {
+	async find(id: string): Promise<Result<PostPrimitives, PostDoesNotExistError>> {
 		const post = await this.repository.search(new PostId(id));
 
 		if (!post) {
-			throw new PostDoesNotExistError(id);
+			return Result.error(new PostDoesNotExistError(id));
 		}
 
-		return post.toPrimitives();
+		return Result.ok(post.toPrimitives());
 	}
+
+	// async find(id: string): Promise<Result<PostPrimitives, PostDoesNotExistError>> {
+	// 	const post = await this.repository.searchWithOptional(new PostId(id));
+	//
+	// 	return post.fold(
+	// 		(post) => Result.ok(post.toPrimitives()),
+	// 		Result.error(new PostDoesNotExistError(id)),
+	// 	);
+	// }
 }

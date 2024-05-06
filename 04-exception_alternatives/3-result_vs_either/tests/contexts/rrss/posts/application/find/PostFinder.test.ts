@@ -1,6 +1,5 @@
 import { PostFinder } from "../../../../../../src/contexts/rrss/posts/application/find/PostFinder";
 import { PostDoesNotExistError } from "../../../../../../src/contexts/rrss/posts/domain/PostDoesNotExistError";
-import { Result } from "../../../../../../src/contexts/shared/domain/Result";
 import { PostIdMother } from "../../domain/PostIdMother";
 import { PostMother } from "../../domain/PostMother";
 import { MockPostRepository } from "../../infrastructure/MockPostRepository";
@@ -16,7 +15,7 @@ describe("PostFinder should", () => {
 
 		repository.shouldSearchAndReturnNull(postId);
 
-		expect(await finder.find(postId.value)).toEqual(Result.error(expectedError));
+		await expect(finder.find(postId.value)).rejects.toThrow(expectedError);
 	});
 
 	it("find an existing post", async () => {
@@ -24,6 +23,6 @@ describe("PostFinder should", () => {
 
 		repository.shouldSearch(post);
 
-		expect(await finder.find(post.id.value)).toEqual(Result.ok(post.toPrimitives()));
+		expect(await finder.find(post.id.value)).toEqual(post.toPrimitives());
 	});
 });

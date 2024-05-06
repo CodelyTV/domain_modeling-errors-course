@@ -5,7 +5,6 @@ import {
 	PostPublisher,
 	PostPublisherErrors,
 } from "../../../../contexts/rrss/posts/application/publish/PostPublisher";
-import { PostDoesNotExistError } from "../../../../contexts/rrss/posts/domain/PostDoesNotExistError";
 import { NullPostRepository } from "../../../../contexts/rrss/posts/infrastructure/NullPostRepository";
 import { assertNever } from "../../../../contexts/shared/domain/assertNever";
 import { InMemoryEventBus } from "../../../../contexts/shared/infrastructure/bus/InMemoryEventBus";
@@ -46,14 +45,12 @@ export async function GET(
 	_request: NextRequest,
 	{ params: { id } }: { params: { id: string } },
 ): Promise<Response> {
-	return executeWithErrorHandling(
-		async () => {
-			const post = await finder.find(id);
-
-			return HttpNextResponse.json(post);
-		},
-		(error: PostDoesNotExistError) => {
-			return HttpNextResponse.domainError(error, 404);
-		},
-	);
+	try {
+		return (await finder.find(id)).fold(
+			(post) => HttpNextResponse.json(post),
+			(error) => HttpNextResponse.domainError(error, 404),
+		);
+	} catch (error) {
+		return HttpNextResponse.internalServerError();
+	}
 }
