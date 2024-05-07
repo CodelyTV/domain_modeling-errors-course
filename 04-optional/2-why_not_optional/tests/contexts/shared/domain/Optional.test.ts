@@ -7,7 +7,7 @@ describe("Optional should", () => {
 		expect(optional.get()).toBe(1);
 	});
 
-	it("get other value if is not deefined", () => {
+	it("get other value if is not defined", () => {
 		const optional = Optional.empty();
 
 		expect(optional.orElse(1)).toBe(1);
