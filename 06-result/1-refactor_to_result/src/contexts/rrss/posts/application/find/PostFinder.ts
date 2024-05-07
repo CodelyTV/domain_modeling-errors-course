@@ -8,8 +8,6 @@ import { PostRepository } from "../../domain/PostRepository";
 
 export type PostPrimitives = Primitives<Post>;
 
-export type PostFinderErrors = PostDoesNotExistError;
-
 export class PostFinder {
 	constructor(private readonly repository: PostRepository) {}
 
