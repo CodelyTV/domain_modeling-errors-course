@@ -8,8 +8,6 @@ import { UserDoesNotExistError } from "../../../users/domain/UserDoesNotExistErr
 import { PostLike } from "../../domain/PostLike";
 import { PostLikeRepository } from "../../domain/PostLikeRepository";
 
-export type PostLikerErrors = PostDoesNotExistError | UserDoesNotExistError;
-
 export class PostLiker {
 	constructor(
 		private readonly postFinder: PostFinder,

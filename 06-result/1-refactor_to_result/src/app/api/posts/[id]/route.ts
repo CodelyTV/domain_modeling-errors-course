@@ -48,7 +48,12 @@ export async function GET(
 	try {
 		return (await finder.find(id)).fold(
 			(post) => HttpNextResponse.json(post),
-			(error) => HttpNextResponse.domainError(error, 404),
+			(error) => {
+				switch (error.type) {
+					case "PostDoesNotExistError":
+						return HttpNextResponse.domainError(error, 404);
+				}
+			},
 		);
 	} catch (error) {
 		return HttpNextResponse.internalServerError();
