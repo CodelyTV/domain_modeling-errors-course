@@ -1,0 +1,22 @@
+name: Main Workflow
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: 21
+
+    - name: Assemble
+      run: ./gradlew assemble --warning-mode all
+
+    - name: Check
+      run: ./gradlew check --warning-mode all
