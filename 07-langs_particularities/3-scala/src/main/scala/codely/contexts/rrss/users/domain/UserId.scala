@@ -1,3 +1,3 @@
 package codely.contexts.rrss.users.domain
 
-case class UserId()
+case class UserId(value: String)

@@ -16,7 +16,7 @@ class PostLikerForComprehension(postFinder: PostFinder, userFinder: UserFinder, 
 		_ <- postFinder.find(postId)
 		_ <- userFinder.find(likerUserId)
 		postLike = PostLike(id)
-		_ <- repository.save(postLike)
-		_ <- eventBus.publish(postLike.pullDomainEvents())
+		_ = repository.save(postLike)
+		_ = eventBus.publish(postLike.pullDomainEvents())
 	} yield ()
 }
