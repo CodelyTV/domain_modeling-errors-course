@@ -1,6 +1,9 @@
+import { sequenceT } from "fp-ts/Apply";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
+
 import { Clock } from "../../../../shared/domain/Clock";
 import { EventBus } from "../../../../shared/domain/event/EventBus";
-import { Result } from "../../../../shared/domain/Result";
 import { PostFinder } from "../../../posts/application/find/PostFinder";
 import { PostDoesNotExistError } from "../../../posts/domain/PostDoesNotExistError";
 import { UserFinder } from "../../../users/application/find/UserFinder";
@@ -19,20 +22,25 @@ export class PostLiker {
 		private readonly eventBus: EventBus,
 	) {}
 
-	async like(
-		id: string,
-		postId: string,
-		likerUserId: string,
-	): Promise<Result<void, PostDoesNotExistError | UserDoesNotExistError>> {
-		return (await this.postFinder.find(postId)).flatMapAsync(async (_post) => {
-			return (await this.userFinder.find(likerUserId)).flatMapAsync(async (_user) => {
+	like(id: string, postId: string, likerUserId: string): E.Either<PostLikerErrors, void> {
+		return pipe(
+			sequenceT(E.Apply)(
+				pipe(
+					this.postFinder.find(postId),
+					E.mapLeft((error: PostDoesNotExistError): PostLikerErrors => error),
+				),
+				pipe(
+					this.userFinder.find(likerUserId),
+					E.mapLeft((error: UserDoesNotExistError): PostLikerErrors => error),
+				),
+			),
+			E.map(([_post, _user]) => {
 				const postLike = PostLike.like(id, postId, likerUserId, this.clock);
+				this.repository.save(postLike);
+				this.eventBus.publish(postLike.pullDomainEvents());
 
-				await this.repository.save(postLike);
-				await this.eventBus.publish(postLike.pullDomainEvents());
-
-				return Result.ok();
-			});
-		});
+				return undefined;
+			}),
+		);
 	}
 }

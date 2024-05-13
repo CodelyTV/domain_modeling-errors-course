@@ -12,6 +12,7 @@
     "test:acceptance": "playwright test"
   },
   "dependencies": {
+    "fp-ts": "^2.16.5",
     "mariadb": "^3.2.3",
     "next": "14.0.4",
     "react": "^18",

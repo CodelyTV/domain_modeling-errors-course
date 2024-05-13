@@ -1,10 +1,10 @@
+import { Option } from "fp-ts/Option";
+
 import { Post } from "./Post";
 import { PostId } from "./PostId";
 
 export interface PostRepository {
-	save(user: Post): Promise<void>;
+	save(user: Post): void;
 
-	search(id: PostId): Promise<Post | null>;
-
-	// searchWithOptional(id: PostId): Promise<Optional<Post>>;
+	search(id: PostId): Option<Post>;
 }

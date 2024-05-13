@@ -1,8 +1,10 @@
+import { Option } from "fp-ts/Option";
+
 import { PostLike } from "./PostLike";
 import { PostLikeId } from "./PostLikeId";
 
 export interface PostLikeRepository {
-	save(postLike: PostLike): Promise<void>;
+	save(postLike: PostLike): void;
 
-	search(id: PostLikeId): Promise<PostLike | null>;
+	search(id: PostLikeId): Option<PostLike>;
 }

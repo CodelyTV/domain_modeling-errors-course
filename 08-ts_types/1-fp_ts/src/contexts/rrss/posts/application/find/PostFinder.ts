@@ -1,6 +1,9 @@
 import { Primitives } from "@codelytv/primitives-type";
+import { Either } from "fp-ts/Either";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
+import * as O from "fp-ts/Option";
 
-import { Result } from "../../../../shared/domain/Result";
 import { Post } from "../../domain/Post";
 import { PostDoesNotExistError } from "../../domain/PostDoesNotExistError";
 import { PostId } from "../../domain/PostId";
@@ -13,22 +16,11 @@ export type PostFinderErrors = PostDoesNotExistError;
 export class PostFinder {
 	constructor(private readonly repository: PostRepository) {}
 
-	async find(id: string): Promise<Result<PostPrimitives, PostDoesNotExistError>> {
-		const post = await this.repository.search(new PostId(id));
-
-		if (!post) {
-			return Result.error(new PostDoesNotExistError(id));
-		}
-
-		return Result.ok(post.toPrimitives());
+	find(id: string): Either<PostDoesNotExistError, PostPrimitives> {
+		return pipe(
+			this.repository.search(new PostId(id)),
+			O.map((post) => post.toPrimitives()),
+			E.fromOption(() => new PostDoesNotExistError(id)),
+		);
 	}
-
-	// async find(id: string): Promise<Result<PostPrimitives, PostDoesNotExistError>> {
-	// 	const post = await this.repository.searchWithOptional(new PostId(id));
-	//
-	// 	return post.fold(
-	// 		(post) => Result.ok(post.toPrimitives()),
-	// 		Result.error(new PostDoesNotExistError(id)),
-	// 	);
-	// }
 }
