@@ -1,0 +1,14 @@
+parameters:
+	paths:
+		- src
+		- tests
+
+	customRulesetUsed: true
+
+
+	exceptions:
+		check:
+			missingCheckedExceptionInThrows: true # Error if an exception is not added to the docblock
+			tooWideThrowType: true # Error if there are any exception in the docblock that are not thrown
+		checkedExceptionClasses:
+			- 'CodelyTv\Contexts\Shared\Domain\DomainError' # Mark DomainError and child classes as checked exceptions
