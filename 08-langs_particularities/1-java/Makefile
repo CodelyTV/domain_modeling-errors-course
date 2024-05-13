@@ -1,4 +1,3 @@
-.PHONY: all
 all: build
 
 .PHONY: build
@@ -8,3 +7,6 @@ build:
 .PHONY: test
 test:
 	@./gradlew check --warning-mode all
+
+static-analysis:
+	@./gradlew rewriteRun
