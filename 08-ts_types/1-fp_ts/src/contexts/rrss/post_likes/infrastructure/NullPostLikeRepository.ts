@@ -1,11 +1,13 @@
+import { Option } from "fp-ts/Option";
+
 import { PostLike } from "../domain/PostLike";
 import { PostLikeId } from "../domain/PostLikeId";
 import { PostLikeRepository } from "../domain/PostLikeRepository";
 
 export class NullPostLikeRepository implements PostLikeRepository {
-	async save(_postLike: PostLike): Promise<void> {}
+	save(_postLike: PostLike): void {}
 
-	async search(_id: PostLikeId): Promise<PostLike | null> {
+	search(_id: PostLikeId): Option<PostLike> {
 		return Promise.resolve(null);
 	}
 }

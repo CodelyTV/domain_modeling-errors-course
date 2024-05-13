@@ -1,3 +1,5 @@
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
 import { NextRequest } from "next/server";
 
 import { PostLiker } from "../../../../contexts/rrss/post_likes/application/like/PostLiker";
@@ -26,17 +28,20 @@ export async function PUT(
 	const body = (await request.json()) as { postId: string; likerUserId: string };
 
 	try {
-		return (await postLiker.like(id, body.postId, body.likerUserId)).fold(
-			() => HttpNextResponse.created(),
-			(error) => {
-				switch (error.type) {
-					case "PostDoesNotExistError":
-					case "UserDoesNotExistError":
-						return HttpNextResponse.domainError(error, 409);
-					default:
-						assertNever(error);
-				}
-			},
+		return pipe(
+			postLiker.like(id, body.postId, body.likerUserId),
+			E.fold(
+				(error) => {
+					switch (error.type) {
+						case "PostDoesNotExistError":
+						case "UserDoesNotExistError":
+							return HttpNextResponse.domainError(error, 409);
+						default:
+							assertNever(error);
+					}
+				},
+				() => HttpNextResponse.created(),
+			),
 		);
 	} catch (error) {
 		return HttpNextResponse.internalServerError();

@@ -1,5 +1,6 @@
 import { sequenceT } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
+import { Either } from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 
 import { Clock } from "../../../../shared/domain/Clock";
@@ -22,7 +23,7 @@ export class PostLiker {
 		private readonly eventBus: EventBus,
 	) {}
 
-	like(id: string, postId: string, likerUserId: string): E.Either<PostLikerErrors, void> {
+	like(id: string, postId: string, likerUserId: string): Either<PostLikerErrors, void> {
 		return pipe(
 			sequenceT(E.Apply)(
 				pipe(
