@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🐘 Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: ⬇️ Install dependencies
+        run: composer install --ignore-platform-reqs
+
+      - name: 💅 Lint
+        run: composer lint
+
+      - name: 🏁 Static analysis
+        run: composer static-analysis --output-format=github --shepherd
+
+      - name: ✅ Run the tests
+        run: composer test
