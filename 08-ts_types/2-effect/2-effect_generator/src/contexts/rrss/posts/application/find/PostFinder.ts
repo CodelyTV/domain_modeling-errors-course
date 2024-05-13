@@ -1,5 +1,5 @@
 import { Primitives } from "@codelytv/primitives-type";
-import { Effect, Option, pipe } from "effect";
+import { Effect, Option } from "effect";
 
 import { Post } from "../../domain/Post";
 import { PostDoesNotExistError } from "../../domain/PostDoesNotExistError";
@@ -12,12 +12,11 @@ export class PostFinder {
 	constructor(private readonly repository: PostRepository) {}
 
 	find(id: string): Effect.Effect<PostPrimitives, PostDoesNotExistError> {
-		return pipe(
-			this.repository.search(new PostId(id)),
-			Option.match({
-				onNone: () => Effect.fail(new PostDoesNotExistError(id)),
-				onSome: (post) => Effect.succeed(post.toPrimitives()),
-			}),
-		);
+		const post = this.repository.search(new PostId(id));
+
+		return Option.match(post, {
+			onNone: () => Effect.fail(new PostDoesNotExistError(id)),
+			onSome: (value) => Effect.succeed(value.toPrimitives()),
+		});
 	}
 }

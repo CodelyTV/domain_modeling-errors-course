@@ -1,4 +1,4 @@
-import { Effect, Option, pipe } from "effect";
+import { Effect, Option } from "effect";
 
 import { UserDoesNotExistError } from "../../domain/UserDoesNotExistError";
 import { UserId } from "../../domain/UserId";
@@ -11,12 +11,11 @@ export class UserFinder {
 	constructor(private readonly repository: UserRepository) {}
 
 	find(id: string): Effect.Effect<UserPrimitives, UserDoesNotExistError> {
-		return pipe(
-			this.repository.search(new UserId(id)),
-			Option.match({
-				onNone: () => Effect.fail(new UserDoesNotExistError(id)),
-				onSome: (user) => Effect.succeed(user.toPrimitives()),
-			}),
-		);
+		const user = this.repository.search(new UserId(id));
+
+		return Option.match(user, {
+			onNone: () => Effect.fail(new UserDoesNotExistError(id)),
+			onSome: (value) => Effect.succeed(value.toPrimitives()),
+		});
 	}
 }

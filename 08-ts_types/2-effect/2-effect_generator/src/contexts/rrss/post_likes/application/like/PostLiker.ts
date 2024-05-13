@@ -1,4 +1,5 @@
-import { Effect, pipe } from "effect";
+/* eslint-disable @typescript-eslint/no-this-alias */
+import { Effect } from "effect";
 
 import { Clock } from "../../../../shared/domain/Clock";
 import { EventBus } from "../../../../shared/domain/event/EventBus";
@@ -21,17 +22,18 @@ export class PostLiker {
 	) {}
 
 	like(id: string, postId: string, likerUserId: string): Effect.Effect<void, PostLikerErrors> {
-		return pipe(
-			this.postFinder.find(postId),
-			(_postPrimitives) => this.userFinder.find(likerUserId),
-			Effect.map((_userPrimitives) => {
-				const postLike = PostLike.like(id, postId, likerUserId, this.clock);
+		const self = this;
 
-				this.repository.save(postLike);
-				this.eventBus.publish(postLike.pullDomainEvents());
+		return Effect.gen(function* () {
+			yield* self.postFinder.find(postId);
+			yield* self.userFinder.find(likerUserId);
 
-				return undefined;
-			}),
-		);
+			const postLike = PostLike.like(id, postId, likerUserId, self.clock);
+
+			self.repository.save(postLike);
+			self.eventBus.publish(postLike.pullDomainEvents());
+
+			return undefined;
+		});
 	}
 }
