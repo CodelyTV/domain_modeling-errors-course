@@ -1,8 +1,5 @@
 import { Primitives } from "@codelytv/primitives-type";
-import { Either } from "fp-ts/Either";
-import * as E from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
-import * as O from "fp-ts/Option";
+import { Effect, Option, pipe } from "effect";
 
 import { Post } from "../../domain/Post";
 import { PostDoesNotExistError } from "../../domain/PostDoesNotExistError";
@@ -11,16 +8,16 @@ import { PostRepository } from "../../domain/PostRepository";
 
 export type PostPrimitives = Primitives<Post>;
 
-export type PostFinderErrors = PostDoesNotExistError;
-
 export class PostFinder {
 	constructor(private readonly repository: PostRepository) {}
 
-	find(id: string): Either<PostDoesNotExistError, PostPrimitives> {
+	find(id: string): Effect.Effect<PostPrimitives, PostDoesNotExistError> {
 		return pipe(
 			this.repository.search(new PostId(id)),
-			O.map((post) => post.toPrimitives()),
-			E.fromOption(() => new PostDoesNotExistError(id)),
+			Option.match({
+				onNone: () => Effect.fail(new PostDoesNotExistError(id)),
+				onSome: (post) => Effect.succeed(post.toPrimitives()),
+			}),
 		);
 	}
 }

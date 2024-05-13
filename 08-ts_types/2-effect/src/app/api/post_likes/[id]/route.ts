@@ -1,5 +1,4 @@
-import * as E from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
+import { Effect, pipe } from "effect";
 import { NextRequest } from "next/server";
 
 import { PostLiker } from "../../../../contexts/rrss/post_likes/application/like/PostLiker";
@@ -27,22 +26,24 @@ export async function PUT(
 ): Promise<Response> {
 	const body = (await request.json()) as { postId: string; likerUserId: string };
 
+	const program = pipe(
+		postLiker.like(id, body.postId, body.likerUserId),
+		Effect.match({
+			onFailure: (error) => {
+				switch (error.type) {
+					case "PostDoesNotExistError":
+					case "UserDoesNotExistError":
+						return HttpNextResponse.domainError(error, 409);
+					default:
+						assertNever(error);
+				}
+			},
+			onSuccess: () => HttpNextResponse.created(),
+		}),
+	);
+
 	try {
-		return pipe(
-			postLiker.like(id, body.postId, body.likerUserId),
-			E.match(
-				(error) => {
-					switch (error.type) {
-						case "PostDoesNotExistError":
-						case "UserDoesNotExistError":
-							return HttpNextResponse.domainError(error, 409);
-						default:
-							assertNever(error);
-					}
-				},
-				() => HttpNextResponse.created(),
-			),
-		);
+		return Effect.runSync(program);
 	} catch (error) {
 		return HttpNextResponse.internalServerError();
 	}

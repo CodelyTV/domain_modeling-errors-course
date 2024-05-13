@@ -1,7 +1,4 @@
-import { sequenceT } from "fp-ts/Apply";
-import * as E from "fp-ts/Either";
-import { Either } from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
+import { Effect, pipe } from "effect";
 
 import { Clock } from "../../../../shared/domain/Clock";
 import { EventBus } from "../../../../shared/domain/event/EventBus";
@@ -23,20 +20,13 @@ export class PostLiker {
 		private readonly eventBus: EventBus,
 	) {}
 
-	like(id: string, postId: string, likerUserId: string): Either<PostLikerErrors, void> {
+	like(id: string, postId: string, likerUserId: string): Effect.Effect<void, PostLikerErrors> {
 		return pipe(
-			sequenceT(E.Apply)(
-				pipe(
-					this.postFinder.find(postId),
-					E.mapLeft((error: PostDoesNotExistError): PostLikerErrors => error),
-				),
-				pipe(
-					this.userFinder.find(likerUserId),
-					E.mapLeft((error: UserDoesNotExistError): PostLikerErrors => error),
-				),
-			),
-			E.map(([_post, _user]) => {
+			this.postFinder.find(postId),
+			(_postPrimitives) => this.userFinder.find(likerUserId),
+			Effect.map((_userPrimitives) => {
 				const postLike = PostLike.like(id, postId, likerUserId, this.clock);
+
 				this.repository.save(postLike);
 				this.eventBus.publish(postLike.pullDomainEvents());
 

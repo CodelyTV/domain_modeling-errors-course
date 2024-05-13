@@ -1,10 +1,7 @@
-import * as E from "fp-ts/Either";
-import { Either } from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
-import * as O from "fp-ts/Option";
+import { Effect, Option, pipe } from "effect";
 
-import { PostId } from "../../../posts/domain/PostId";
 import { UserDoesNotExistError } from "../../domain/UserDoesNotExistError";
+import { UserId } from "../../domain/UserId";
 import { UserRepository } from "../../domain/UserRepository";
 import { UserPrimitives } from "../UserPrimitives";
 
@@ -13,11 +10,13 @@ export type UserFinderErrors = UserDoesNotExistError;
 export class UserFinder {
 	constructor(private readonly repository: UserRepository) {}
 
-	find(id: string): Either<UserDoesNotExistError, UserPrimitives> {
+	find(id: string): Effect.Effect<UserPrimitives, UserDoesNotExistError> {
 		return pipe(
-			this.repository.search(new PostId(id)),
-			O.map((user) => user.toPrimitives()),
-			E.fromOption(() => new UserDoesNotExistError(id)),
+			this.repository.search(new UserId(id)),
+			Option.match({
+				onNone: () => Effect.fail(new UserDoesNotExistError(id)),
+				onSome: (user) => Effect.succeed(user.toPrimitives()),
+			}),
 		);
 	}
 }

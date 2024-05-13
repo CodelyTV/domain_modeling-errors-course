@@ -1,4 +1,4 @@
-import { Option } from "fp-ts/Option";
+import { Option } from "effect/Option";
 
 import { User } from "./User";
 import { UserId } from "./UserId";

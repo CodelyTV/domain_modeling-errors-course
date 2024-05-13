@@ -1,4 +1,4 @@
-import { Option } from "fp-ts/Option";
+import { Option } from "effect/Option";
 
 import { Post } from "./Post";
 import { PostId } from "./PostId";
