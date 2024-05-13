@@ -10,6 +10,8 @@ targetCompatibility = 21
 rewrite {
     activeRecipe("org.openrewrite.staticanalysis.UnnecessaryThrows")
 //    activeRecipe("org.openrewrite.staticanalysis.UnnecessaryCatch")
+
+    failOnDryRunResults = true
 }
 
 repositories {
