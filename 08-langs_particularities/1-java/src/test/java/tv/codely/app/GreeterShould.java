@@ -1,4 +1,4 @@
-package tv.codely.java_basic_skeleton;
+package tv.codely.app;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
