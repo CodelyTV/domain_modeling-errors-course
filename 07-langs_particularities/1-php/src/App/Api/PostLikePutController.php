@@ -6,7 +6,6 @@ namespace CodelyTv\App\Api;
 use CodelyTv\Contexts\PostLikes\Application\Like\PostLiker;
 use CodelyTv\Contexts\Posts\Domain\PostDoesNotExistError;
 use CodelyTv\Contexts\Shared\Infrastructure\Response;
-use CodelyTv\Contexts\Users\Domain\PepeUserDoesNotExistError;
 use CodelyTv\Contexts\Users\Domain\UserDoesNotExistError;
 
 final readonly class PostLikePutController
