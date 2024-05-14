@@ -5,7 +5,6 @@ parameters:
 
 	customRulesetUsed: true
 
-
 	exceptions:
 		check:
 			missingCheckedExceptionInThrows: true # Error if an exception is not added to the docblock
