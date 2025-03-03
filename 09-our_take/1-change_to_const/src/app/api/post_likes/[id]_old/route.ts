@@ -12,8 +12,8 @@ import { NullUserRepository } from "../../../../contexts/rrss/users/infrastructu
 import { assertNever } from "../../../../contexts/shared/domain/assertNever";
 import { InMemoryEventBus } from "../../../../contexts/shared/infrastructure/bus/InMemoryEventBus";
 import { DateClock } from "../../../../contexts/shared/infrastructure/DateClock";
+import { executeWithErrorHandling } from "../../../../contexts/shared/infrastructure/http/executeWithErrorHandling";
 import { HttpNextResponse } from "../../../../contexts/shared/infrastructure/http/HttpNextResponse";
-import { withErrorHandling } from "../../../../contexts/shared/infrastructure/http/withErrorHandling";
 
 const postLiker = new PostLiker(
 	new PostFinder(new NullPostRepository()),
@@ -23,24 +23,26 @@ const postLiker = new PostLiker(
 	new InMemoryEventBus([]),
 );
 
-export const PUT = withErrorHandling(
-	async (
-		request: NextRequest,
-		{ params: { id } }: { params: { id: string } },
-	): Promise<Response> => {
-		const body = (await request.json()) as { postId: string; likerUserId: string };
+export async function PUT(
+	request: NextRequest,
+	{ params: { id } }: { params: { id: string } },
+): Promise<Response> {
+	const body = (await request.json()) as { postId: string; likerUserId: string };
 
-		await postLiker.like(id, body.postId, body.likerUserId);
+	return executeWithErrorHandling(
+		async () => {
+			await postLiker.like(id, body.postId, body.likerUserId);
 
-		return HttpNextResponse.created();
-	},
-	(error: PostLikerErrors) => {
-		switch (error.type) {
-			case "PostDoesNotExistError":
-			case "UserDoesNotExistError":
-				return HttpNextResponse.domainError(error, 409);
-			default:
-				assertNever(error);
-		}
-	},
-);
+			return HttpNextResponse.created();
+		},
+		(error: PostLikerErrors) => {
+			switch (error.type) {
+				case "PostDoesNotExistError":
+				case "UserDoesNotExistError":
+					return HttpNextResponse.domainError(error, 409);
+				default:
+					assertNever(error);
+			}
+		},
+	);
+}
