@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 
-import { DomainError } from "../../domain/DomainError";
+import { CodelyError } from "../../domain/CodelyError";
 
 export class HttpNextResponse {
-	static domainError(error: DomainError, statusCode: number): NextResponse {
+	static domainError(error: CodelyError, statusCode: number): NextResponse {
 		return NextResponse.json(
 			{
 				error: error.toPrimitives(),

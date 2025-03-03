@@ -1,6 +1,5 @@
-import { DomainError } from "../../../shared/domain/DomainError";
+import { CodelyError } from "../../../shared/domain/CodelyError";
 
-export class PostContentIsEmptyError extends DomainError {
-	readonly type = "PostContentIsEmptyError";
-	readonly message = "Post content is empty";
+export class PostContentIsEmptyError extends CodelyError {
+	readonly message = "PostContentIsEmptyError";
 }

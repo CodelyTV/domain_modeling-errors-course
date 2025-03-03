@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 
-import { DomainError } from "../../domain/DomainError";
+import { CodelyError } from "../../domain/CodelyError";
 import { HttpNextResponse } from "./HttpNextResponse";
 
-export function withErrorHandling<T extends DomainError, P = unknown>(
+export function withErrorHandling<T extends CodelyError, P = unknown>(
 	fn: (request: NextRequest, params: P) => Promise<Response>,
 	onError: (error: T) => Response | void = () => undefined,
 ) {
@@ -11,7 +11,7 @@ export function withErrorHandling<T extends DomainError, P = unknown>(
 		try {
 			return await fn(request, params);
 		} catch (error: unknown) {
-			if (error instanceof DomainError) {
+			if (error instanceof CodelyError) {
 				const response = onError(error as T);
 
 				if (response) {

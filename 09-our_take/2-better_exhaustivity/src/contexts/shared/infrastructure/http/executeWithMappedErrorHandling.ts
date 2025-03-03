@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { DomainError } from "../../domain/DomainError";
+import { CodelyError } from "../../domain/CodelyError";
 import { HttpNextResponse } from "./HttpNextResponse";
 
 export async function executeWithMappedErrorHandling(
@@ -10,7 +10,7 @@ export async function executeWithMappedErrorHandling(
 	try {
 		return await fn();
 	} catch (error: unknown) {
-		if (error instanceof DomainError && errorMap[error.constructor.name]) {
+		if (error instanceof CodelyError && errorMap[error.constructor.name]) {
 			return HttpNextResponse.domainError(error, errorMap[error.constructor.name]);
 		}
 

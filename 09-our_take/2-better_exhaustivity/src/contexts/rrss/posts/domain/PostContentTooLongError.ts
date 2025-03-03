@@ -1,13 +1,9 @@
-import { DomainError } from "../../../shared/domain/DomainError";
+import { CodelyError } from "../../../shared/domain/CodelyError";
 
-export class PostContentTooLongError extends DomainError {
-	readonly type = "PostContentTooLongError";
-	readonly message = `The post content <<< ${this.content} >>> is longer than ${this.maxLength} characters.`;
+export class PostContentTooLongError extends CodelyError {
+	readonly message = "PostContentTooLongError";
 
-	constructor(
-		public readonly content: string,
-		public readonly maxLength: number,
-	) {
-		super();
+	constructor(content: string, maxLength: number) {
+		super({ content, maxLength });
 	}
 }

@@ -1,10 +1,9 @@
-import { DomainError } from "../../../shared/domain/DomainError";
+import { CodelyError } from "../../../shared/domain/CodelyError";
 
-export class PostDoesNotExistError extends DomainError {
-	readonly type = "PostDoesNotExistError";
-	readonly message = `The post ${this.id} does not exist`;
+export class PostDoesNotExistError extends CodelyError {
+	readonly message = "PostDoesNotExistError";
 
-	constructor(public readonly id: string) {
-		super();
+	constructor(id: string) {
+		super({ id });
 	}
 }
