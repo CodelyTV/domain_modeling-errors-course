@@ -1,0 +1,46 @@
+/* eslint-disable no-console */
+
+// @ts-ignore
+abstract class DomainError extends Error {
+	abstract name: string;
+	abstract message: string;
+}
+
+// @ts-ignore
+class UserNameIsEmptyError extends DomainError {
+	readonly name = "UserNameIsEmptyError";
+	message = "User name is empty";
+}
+
+// @ts-ignore
+class PostIsDeletedError extends DomainError {
+	readonly name = "PostIsDeletedError";
+	message = "Post is deleted";
+}
+
+// @ts-ignore
+class PostIsArchivedError extends DomainError {
+	readonly name = "PostIsArchivedError";
+	message = "Post is archived";
+}
+
+// @ts-ignore
+type AllErrors = UserNameIsEmptyError | PostIsDeletedError | PostIsArchivedError;
+
+function handleErrors(error: AllErrors): void {
+	switch (error.name) {
+		case "UserNameIsEmptyError":
+			console.log("UserNameIsEmptyError");
+			break;
+		case "PostIsDeletedError":
+			console.log("PostIsDeletedError");
+			break;
+		case "PostIsArchivedError":
+			console.log("PostIsArchivedError");
+			break;
+		default:
+			const exhaustiveCheck: never = error;
+
+			return exhaustiveCheck;
+	}
+}
