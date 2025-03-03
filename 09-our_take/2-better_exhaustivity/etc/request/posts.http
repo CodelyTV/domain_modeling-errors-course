@@ -1,0 +1,9 @@
+### Create new post
+
+PUT http://localhost:3000/api/posts/{{$random.uuid}}
+Content-Type: application/json
+
+{
+  "userId": "{{$random.uuid}}",
+  "content": ""
+}
